@@ -1,0 +1,37 @@
+Import-Module ActiveDirectory
+
+$OU = "OU=Computers,DC=example,DC=com"
+$Group = 'DOMENA\DelegovanaSkupina'
+
+# GUID pro Computer třídu
+$ComputerClassGUID = [Guid]"bf967a86-0de6-11d0-a285-00aa003049e2"
+
+$RightsMap = @(
+    @{ Name = "Reset Password"; GUID = "00299570-246d-11d0-a768-00aa006e0529"; Dsacls = "CA;Reset Password;computer" },
+    @{ Name = "Validated Write DNS Host Name"; GUID = "72e39547-7b18-11d1-adef-00c04fd8d5cd"; Dsacls = "SW;Validated write to DNS host name;computer" },
+    @{ Name = "Validated Write SPN"; GUID = "f3a64788-5306-11d1-a9c5-0000f80367c1"; Dsacls = "SW;Validated write to service principal name;computer" },
+    @{ Name = "Write userAccountControl"; GUID = "bf967a68-0de6-11d0-a285-00aa003049e2"; Dsacls = "WP;userAccountControl;computer" }
+)
+
+$Acl = Get-Acl "AD:$OU"
+$AccessRules = $Acl.Access | Where-Object { $_.IdentityReference -like "*$Group*" }
+
+Write-Host "`n[DEBUG] Nalezené záznamy pro skupinu:" -ForegroundColor Yellow
+$AccessRules | Format-Table IdentityReference, ActiveDirectoryRights, ObjectType, InheritedObjectType
+
+Write-Host "`nKontrola oprávnění:`n"
+
+foreach ($Right in $RightsMap) {
+    $Guid = [Guid]$Right.GUID
+    $HasRight = $AccessRules | Where-Object {
+        $_.ObjectType -eq $Guid -and $_.InheritedObjectType -eq $ComputerClassGUID
+    }
+    if ($HasRight) {
+        Write-Host "[OK] $($Right.Name)" -ForegroundColor Green
+    } else {
+        Write-Host "[CHYBÍ] $($Right.Name)" -ForegroundColor Red
+        $cmd = 'dsacls "' + $OU + '" /G "' + $Group + ':' + $Right.Dsacls + '" /I:S'
+        Write-Host " -> Přidej pomocí:" -ForegroundColor Yellow
+        Write-Host $cmd -ForegroundColor Cyan
+    }
+}
