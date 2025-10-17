@@ -1,0 +1,36 @@
+
+Import-Module ActiveDirectory
+
+$OU = "OU=Computers,DC=example,DC=com"
+$Group = "DelegovanaSkupina"
+
+# GUID mapování
+$RightsMap = @{
+    "Reset Password" = "00299570-246d-11d0-a768-00aa006e0529"
+    "Validated Write DNS Host Name" = "72e39547-7b18-11d1-adef-00c04fd8d5cd"
+    "Validated Write SPN" = "f3a64788-5306-11d1-a9c5-0000f80367c1"
+    "userAccountControl" = "bf967a68-0de6-11d0-a285-00aa003049e2"
+}
+
+$Acl = Get-Acl "AD:$OU"
+$AccessRules = $Acl.Access | Where-Object { $_.IdentityReference -like "*$Group*" }
+
+Write-Host "`nKontrola oprávnění pro skupinu '$Group' v OU '$OU'`n"
+
+foreach ($Right in $RightsMap.Keys) {
+    $Guid = [Guid]$RightsMap[$Right]
+    $HasRight = $AccessRules | Where-Object { $_.ObjectType -eq $Guid }
+    if ($HasRight) {
+        Write-Host "[OK] $Right" -ForegroundColor Green
+    } else {
+        Write-Host "[CHYBÍ] $Right" -ForegroundColor Red
+    }
+}
+
+# Kontrola Create/Delete Computer Objects
+$CreateDelete = $AccessRules | Where-Object { $_.ActiveDirectoryRights -match "CreateChild|DeleteChild" }
+if ($CreateDelete) {
+    Write-Host "[OK] Create/Delete Computer Objects" -ForegroundColor Green
+} else {
+    Write-Host "[CHYBÍ] Create/Delete Computer Objects" -ForegroundColor Red
+}
