@@ -1,0 +1,1 @@
+dsacls "OU=Computers,DC=example,DC=com" /G "DOMENA\DelegovanaSkupina:WP;userAccountControl;computer"
