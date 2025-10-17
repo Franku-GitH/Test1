@@ -1,0 +1,28 @@
+
+# Nastavení proměnných
+$OU = "OU=Computers,DC=example,DC=com"   # Cesta k OU
+$Group = "DelegovanaSkupina"             # Název skupiny
+
+# Potřebná oprávnění
+$RequiredRights = @(
+    "CONTROL_ACCESS: Reset Password",
+    "VALIDATED_WRITE: DNS Host Name",
+    "VALIDATED_WRITE: Service Principal Name",
+    "WRITE_PROPERTY: userAccountControl",
+    "CREATE_CHILD",
+    "DELETE_CHILD"
+)
+
+# Načtení ACL pro OU
+$Acl = Get-Acl "AD:$OU"
+$AccessRules = $Acl.Access | Where-Object { $_.IdentityReference -like "*$Group*" }
+
+Write-Host "Kontrola oprávnění pro skupinu '$Group' v OU '$OU'`n"
+
+foreach ($Right in $RequiredRights) {
+    if ($AccessRules.ActiveDirectoryRights -match ($Right.Split(":")[0].Trim())) {
+        Write-Host "[OK] $Right" -ForegroundColor Green
+    } else {
+        Write-Host "[CHYBÍ] $Right" -ForegroundColor Red
+    }
+}
