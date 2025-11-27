@@ -1,0 +1,14 @@
+
+selector1._domainkey
+selector1-vz-gov-cz._domainkey.vianit.a-v1.dkim.mail.microsoft
+
+
+selector2._domainkey
+selector2-vz-gov-cz._domainkey.vianit.a-v1.dkim.mail.microsoft
+
+
+selector1._domainkey
+selector1-dod-gov-cz._domainkey.vianit.e-v1.dkim.mail.microsoft
+
+selector2._domainkey
+selector2-dod-gov-cz._domainkey.vianit.e-v1.dkim.mail.microsoft
