@@ -1,0 +1,26 @@
+; 
+; VIANIT SubCA01 Configuration
+
+[Version]
+Signature="$Windows NT$"
+
+[AllIssuancePolicy]
+OID = 2.5.29.32.0
+ 
+[EnhancedKeyUsageExtension]
+OID= 1.3.6.1.4.1.5847.3.2
+Critical= No
+
+[BasicConstraintsExtension]
+PathLength=0
+Critical=true
+
+[certsrv_server]
+RenewalKeyLength=4096
+RenewalValidityPeriodUnits=6
+RenewalValidityPeriod=Years
+
+CRLPeriodUnits=9
+CRLPeriod=Days
+CRLDeltaPeriodUnits=0
+CRLDeltaPeriod=Days
