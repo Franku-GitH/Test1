@@ -1,0 +1,1 @@
+certutil -setreg CA\CRLPublicationURLs "65:%windir%\system32\Certsrv\CertEnroll\%%3%%8.crl\n3:ldap:///CN=%%7%%8,CN=%%2,CN=CDP,CN=Public Key Services,CN=Services,%%6%%10\n2:http://pki.vz.gov.cz/pki/%%3%%8.crl\n2:http://pki.dod.gov.cz/pki/%%3%%8.crl"
