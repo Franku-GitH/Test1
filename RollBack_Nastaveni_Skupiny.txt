@@ -1,0 +1,12 @@
+$setting = Get-MgGroupSetting -GroupId $groupId
+
+$params = @{
+  values = @(
+    @{
+      name  = "AllowAddGuests"
+      value = "True"
+    }
+  )
+}
+
+Update-MgGroupSetting -GroupId $groupId -GroupSettingId $setting.Id -BodyParameter $params
