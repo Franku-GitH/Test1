@@ -84,4 +84,30 @@ foreach ($user in $AllSynced) {
         }
         else {
             $NotSignedUsersOutput += [PSCustomObject]@{
-                UPN = $user
+                UPN = $user.UserPrincipalName
+            }
+        }
+    }
+    catch {
+        $NotSignedUsersOutput += [PSCustomObject]@{
+            UPN = $user.UserPrincipalName
+        }
+    }
+}
+
+####################################################################################################
+# EXPORT CSV
+####################################################################################################
+
+$SignedUsersOutput | Export-Csv -Path $LogPathSigned -NoTypeInformation -Encoding UTF8
+$NotSignedUsersOutput | Export-Csv -Path $LogPathNotSigned -NoTypeInformation -Encoding UTF8
+
+####################################################################################################
+# STATS
+####################################################################################################
+
+Write-Host "------------------------------------------------------"
+Write-Host "Celkem synchronizovanych uzivatelu:" $AllSynced.Count
+Write-Host "Prihlasenych = $($SignedUsersOutput.Count)" -ForegroundColor Green
+Write-Host "Neprihlasenych = $($NotSignedUsersOutput.Count)" -ForegroundColor Red
+Get-Date
